@@ -185,7 +185,7 @@ test('DOMRenderer', function(t) {
 
         domRenderer.setContent('only text');
         t.equal(element.children[0].children[0].constructor, HTMLDivElement, 'DOMRenderer should wrap content into content div');
-        t.equal(element.children[0].children[0].innerHTML, 'only text');
+        t.equal(element.children[0].children[0].textContent, 'only text');
 
         domRenderer.setContent('also <strong>HTML</strong> should work');
         t.equal(element.children[0].children[0].innerHTML, 'also <strong>HTML</strong> should work');

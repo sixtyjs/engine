@@ -592,11 +592,12 @@ DOMRenderer.prototype.setAttribute = function setAttribute(name, value) {
 };
 
 /**
- * Sets the `innerHTML` content of the currently loaded target.
+ * Sets the content of the currently loaded target as `innerHTML`, `textContent`
+ * or instanceof HMTLElement.
  *
  * @method
  *
- * @param {String} content Content to be set as `innerHTML`
+ * @param {String|HTMLElement} content Content to be set.
  *
  * @return {undefined} undefined
  */
@@ -621,7 +622,16 @@ DOMRenderer.prototype.setContent = function setContent(content) {
         }
 
         if (typeof content === 'string') {
-            targetContent.innerHTML = content;
+            // HTML
+            // Basic look-up for html tags. In the future we want the user to be able to set the 
+            // content type explicitly on the DOMElement for clean optimizations.
+            if (/\<\s*\w+[\s\S]*\>/i.test(content) === true) {
+                targetContent.innerHTML = content;
+            }
+            // Text only.
+            else {
+                targetContent.textContent = content;
+            }
         } else {
             var lastChild = null;
 
