@@ -46,7 +46,7 @@ var TRANSFORM = null;
  * @param {String} selector the selector of the element.
  * @param {Compositor} compositor the compositor controlling the renderer
  */
-function DOMRenderer (element, selector, compositor) {
+function DOMRenderer(element, selector, compositor) {
     var _this = this;
 
     element.classList.add('famous-dom-renderer');
@@ -55,29 +55,29 @@ function DOMRenderer (element, selector, compositor) {
     this._compositor = compositor; // a reference to the compositor
 
     this._target = null; // a register for holding the current
-                         // element that the Renderer is operating
-                         // upon
+    // element that the Renderer is operating
+    // upon
 
     this._parent = null; // a register for holding the parent
-                         // of the target
+    // of the target
 
     this._path = null; // a register for holding the path of the target
-                       // this register must be set first, and then
-                       // children, target, and parent are all looked
-                       // up from that.
+    // this register must be set first, and then
+    // children, target, and parent are all looked
+    // up from that.
 
     this._children = []; // a register for holding the children of the
-                         // current target.
+    // current target.
 
-     this._insertElCallbackStore = new CallbackStore();
-     this._removeElCallbackStore = new CallbackStore();
+    this._insertElCallbackStore = new CallbackStore();
+    this._removeElCallbackStore = new CallbackStore();
 
     this._root = new ElementCache(element, selector); // the root
-                                                      // of the dom tree that this
-                                                      // renderer is responsible
-                                                      // for
+    // of the dom tree that this
+    // renderer is responsible
+    // for
 
-    this._boundTriggerEvent = function (ev) {
+    this._boundTriggerEvent = function(ev) {
         return _this._triggerEvent(ev);
     };
 
@@ -165,9 +165,7 @@ DOMRenderer.prototype.allowDefault = function allowDefault(type) {
 DOMRenderer.prototype._listen = function _listen(type) {
     this._assertTargetLoaded();
 
-    if (
-        !this._target.listeners[type] && !this._root.listeners[type]
-    ) {
+    if (!this._target.listeners[type] && !this._root.listeners[type]) {
         // FIXME Add to content DIV if available
         var target = eventMap[type][1] ? this._root : this._target;
         target.listeners[type] = this._boundTriggerEvent;
@@ -251,7 +249,7 @@ DOMRenderer.prototype.getSizeOf = function getSizeOf(path) {
     var element = this._elements[path];
     if (!element) return null;
 
-    var res = {val: element.size};
+    var res = { val: element.size };
     this._compositor.sendEvent(path, 'resize', res);
     return res;
 };
@@ -365,7 +363,7 @@ DOMRenderer.prototype._assertTargetLoaded = function _assertTargetLoaded() {
  *
  * @return {ElementCache} Parent element.
  */
-DOMRenderer.prototype.findParent = function findParent () {
+DOMRenderer.prototype.findParent = function findParent() {
     this._assertPathLoaded();
 
     var path = this._path;
@@ -402,7 +400,7 @@ DOMRenderer.prototype.findTarget = function findTarget() {
  *
  * @return {String} Loaded path
  */
-DOMRenderer.prototype.loadPath = function loadPath (path) {
+DOMRenderer.prototype.loadPath = function loadPath(path) {
     this._path = path;
     this._target = this._elements[this._path];
     return this._path;
@@ -418,7 +416,7 @@ DOMRenderer.prototype.loadPath = function loadPath (path) {
  * @param {HTMLElement} element the inserted element
  * @param {HTMLElement} parent the parent of the inserted element
  */
-DOMRenderer.prototype.resolveChildren = function resolveChildren (element, parent) {
+DOMRenderer.prototype.resolveChildren = function resolveChildren(element, parent) {
     var i = 0;
     var childNode;
     var path = this._path;
@@ -449,7 +447,7 @@ DOMRenderer.prototype.resolveChildren = function resolveChildren (element, paren
  *
  * @return {undefined} undefined
  */
-DOMRenderer.prototype.insertEl = function insertEl (tagName) {
+DOMRenderer.prototype.insertEl = function insertEl(tagName) {
 
     this.findParent();
 
@@ -486,7 +484,7 @@ DOMRenderer.prototype.insertEl = function insertEl (tagName) {
  *
  * @return {undefined} undefined
  */
-DOMRenderer.prototype.setProperty = function setProperty (name, value) {
+DOMRenderer.prototype.setProperty = function setProperty(name, value) {
     this._assertTargetLoaded();
     this._target.element.style[name] = value;
 };
@@ -507,7 +505,7 @@ DOMRenderer.prototype.setProperty = function setProperty (name, value) {
  *
  * @return {undefined} undefined
  */
-DOMRenderer.prototype.setSize = function setSize (width, height) {
+DOMRenderer.prototype.setSize = function setSize(width, height) {
     this._assertTargetLoaded();
 
     this.setWidth(width);
@@ -537,8 +535,7 @@ DOMRenderer.prototype.setWidth = function setWidth(width) {
         if (contentWrapper) contentWrapper.style.width = '';
         width = contentWrapper ? contentWrapper.offsetWidth : 0;
         this._target.element.style.width = width + 'px';
-    }
-    else {
+    } else {
         this._target.explicitWidth = false;
         if (contentWrapper) contentWrapper.style.width = width + 'px';
         this._target.element.style.width = width + 'px';
@@ -570,8 +567,7 @@ DOMRenderer.prototype.setHeight = function setHeight(height) {
         if (contentWrapper) contentWrapper.style.height = '';
         height = contentWrapper ? contentWrapper.offsetHeight : 0;
         this._target.element.style.height = height + 'px';
-    }
-    else {
+    } else {
         this._target.explicitHeight = false;
         if (contentWrapper) contentWrapper.style.height = height + 'px';
         this._target.element.style.height = height + 'px';
@@ -605,27 +601,42 @@ DOMRenderer.prototype.setAttribute = function setAttribute(name, value) {
  * @return {undefined} undefined
  */
 DOMRenderer.prototype.setContent = function setContent(content) {
+    var target = this._target;
+
     this._assertTargetLoaded();
 
-    if (this._target.formElement) {
-        this._target.element.value = content;
-    }
-    else {
-        if (!this._target.content) {
-            this._target.content = document.createElement('div');
-            this._target.content.classList.add('famous-dom-element-content');
-            this._target.element.insertBefore(
-                this._target.content,
-                this._target.element.firstChild
+    if (target.formElement) {
+        target.element.value = content;
+    } else {
+        var targetContent = target.content;
+
+        // On settings initial content.
+        if (!targetContent) {
+            targetContent = target.content = document.createElement('div');
+            targetContent.classList.add('famous-dom-element-content');
+            target.element.insertBefore(
+                targetContent,
+                target.element.firstChild
             );
         }
-        this._target.content.innerHTML = content;
+
+        if (typeof content === 'string') {
+            targetContent.innerHTML = content;
+        } else {
+            var lastChild = null;
+
+            while ((lastChild = targetContent.lastChild) !== null) {
+                targetContent.removeChild(lastChild);
+            }
+
+            targetContent.appendChild(content);
+        }
     }
 
 
     this.setSize(
-        this._target.explicitWidth ? false : this._target.size[0],
-        this._target.explicitHeight ? false : this._target.size[1]
+        target.explicitWidth ? false : target.size[0],
+        target.explicitHeight ? false : target.size[1]
     );
 };
 
@@ -640,7 +651,7 @@ DOMRenderer.prototype.setContent = function setContent(content) {
  *
  * @return {undefined} undefined
  */
-DOMRenderer.prototype.setMatrix = function setMatrix (transform) {
+DOMRenderer.prototype.setMatrix = function setMatrix(transform) {
     this._assertTargetLoaded();
     this._target.element.style[TRANSFORM] = this._stringifyMatrix(transform);
 };

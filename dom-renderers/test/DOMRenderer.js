@@ -40,7 +40,7 @@ var DOMRenderer = require('../DOMRenderer');
  */
 function createUnidirectionalCompositor(t) {
     return {
-        sendEvent: function () {
+        sendEvent: function() {
             t.fail('DOMRenderer should not send delegated events for a static DOM tree');
         }
     };
@@ -190,6 +190,11 @@ test('DOMRenderer', function(t) {
         domRenderer.setContent('also <strong>HTML</strong> should work');
         t.equal(element.children[0].children[0].innerHTML, 'also <strong>HTML</strong> should work');
 
+        // Test element injection.
+        var content003 = document.createElement('div');
+        domRenderer.setContent(content003);
+        t.equal(element.firstChild.firstChild.firstChild, content003);
+
         domRenderer.setContent('combined <strong>HTML</strong> and nodes <section></section>');
         domRenderer.loadPath(selector + '/' + 0 + '/' + 1);
         domRenderer.insertEl('section');
@@ -248,7 +253,7 @@ test('DOMRenderer', function(t) {
         var sentEvents = [];
 
         var compositor = {
-            sendEvent: function (path, ev, payload) {
+            sendEvent: function(path, ev, payload) {
                 sentEvents.push([path, ev, payload]);
             }
         };
@@ -284,8 +289,7 @@ test('DOMRenderer', function(t) {
         domRenderer._triggerEvent(ev1);
 
         t.deepEqual(
-            sentEvents[0].slice(0, 2),
-            [ selector + '/' + 0 + '/' + 1 + '/' + 0, ev1.type ],
+            sentEvents[0].slice(0, 2), [selector + '/' + 0 + '/' + 1 + '/' + 0, ev1.type],
             'domRenderer._triggerEvent should emit correct event on leaf node'
         );
 

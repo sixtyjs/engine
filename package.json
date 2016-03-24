@@ -9,7 +9,7 @@
     "test-components": "browserify components/test/*.js | npm run tape",
     "test-core": "npm run test-new",
     "test-dom-renderables": "browserify dom-renderables/test/*.js | npm run tape",
-    "test-dom-renderers": "browserify dom-renderers/test/*.js | npm run tape",
+    "test-dom-renderers": "browserify dom-renderers/test/DOMRenderer.js | npm run tape",
     "test-render-loops": "browserify render-loops/test/*.js | npm run tape",
     "test-math": "browserify math/test/*.js | npm run tape",
     "test-physics": "browserify physics/test/*.js physics/test/*/*.js | npm run tape",
