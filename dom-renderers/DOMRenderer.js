@@ -621,6 +621,7 @@ DOMRenderer.prototype.setContent = function setContent(content) {
             );
         }
 
+        // Set content based on content type.
         if (typeof content === 'string') {
             // HTML
             // Basic look-up for html tags. In the future we want the user to be able to set the 
