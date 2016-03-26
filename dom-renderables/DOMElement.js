@@ -26,7 +26,6 @@
 
 var CallbackStore = require('../utilities/CallbackStore');
 var TransformSystem = require('../core/TransformSystem');
-var OpacitySystem = require('../core/OpacitySystem');
 var Commands = require('../core/Commands');
 var Size = require('../core/Size');
 
@@ -80,6 +79,7 @@ function DOMElement(node, options) {
     this._callbacks = new CallbackStore();
 
     this.setProperty('display', node.isShown() ? 'block' : 'none');
+    this.onOpacityChange(node.getOpacity());
 
     if (!options) return;
 
@@ -172,7 +172,6 @@ DOMElement.prototype.onMount = function onMount(node, id) {
     this._UIEvents = node.getUIEvents().slice(0);
     TransformSystem.makeBreakPointAt(node.getLocation());
     this.onSizeModeChange.apply(this, node.getSizeMode());
-    OpacitySystem.makeBreakPointAt(node.getLocation());
     this.draw();
     this.setAttribute('data-fa-path', node.getLocation());
 };
@@ -292,8 +291,6 @@ DOMElement.prototype.onSizeChange = function onSizeChange(x, y) {
  * @return {DOMElement} this
  */
 DOMElement.prototype.onOpacityChange = function onOpacityChange(opacity) {
-    opacity = opacity.getLocalOpacity();
-
     return this.setProperty('opacity', opacity);
 };
 
@@ -471,7 +468,6 @@ DOMElement.prototype.init = function init () {
     this._changeQueue.push(Commands.INIT_DOM, this._tagName);
     this._initialized = true;
     this.onTransformChange(TransformSystem.get(this._node.getLocation()));
-    this.onOpacityChange(OpacitySystem.get(this._node.getLocation()));
     var size = this._node.getSize();
     this.onSizeChange(size[0], size[1]);
     if (!this._requestingUpdate) this._requestUpdate();

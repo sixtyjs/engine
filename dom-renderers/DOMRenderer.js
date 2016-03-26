@@ -626,7 +626,7 @@ DOMRenderer.prototype.setContent = function setContent(content) {
             // HTML
             // Basic look-up for html tags. In the future we want the user to be able to set the 
             // content type explicitly on the DOMElement for clean optimizations.
-            if (/\<\s*\w+[\s\S]*\>/i.test(content) === true) {
+            if (/\<\w+[\s\S]*?\>/.test(content) === true) {
                 targetContent.innerHTML = content;
             }
             // Text only.
@@ -634,10 +634,12 @@ DOMRenderer.prototype.setContent = function setContent(content) {
                 targetContent.textContent = content;
             }
         } else {
-            var lastChild = null;
+            var lastChild = targetContent.lastChild;
 
-            while ((lastChild = targetContent.lastChild) !== null) {
+            while (lastChild !== null) {
                 targetContent.removeChild(lastChild);
+
+                lastChild = targetContent.lastChild;
             }
 
             targetContent.appendChild(content);
